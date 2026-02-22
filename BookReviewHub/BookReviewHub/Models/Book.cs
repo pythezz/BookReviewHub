@@ -29,7 +29,7 @@ namespace BookReviewHub.Models
         public int GenreId { get; set; }
 
         [ForeignKey(nameof(GenreId))]
-        public Genre Genre { get; set; } = null!;
+        public Genre? Genre { get; set; }
 
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
     }
