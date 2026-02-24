@@ -139,13 +139,23 @@ namespace BookReviewHub.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var genre = await _context.Genres.FindAsync(id);
+            var genre = await _context.Genres
+                .Include(g => g.Books)
+                .FirstOrDefaultAsync(g => g.Id == id);
+
             if (genre != null)
             {
-                _context.Genres.Remove(genre);
+                return NotFound();
+            }
+            if (genre.Books.Any())
+            {
+                ModelState.AddModelError("", "Cannot delete genre because it has books assigned to it.");
+                return View(genre);
             }
 
+            _context.Genres.Remove(genre);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
