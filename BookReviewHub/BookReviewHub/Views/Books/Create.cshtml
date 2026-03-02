@@ -29,7 +29,7 @@
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="PublicationYear" class="control-label"></label>
+                <label asp-for="PublicationYear" class="control-label">Publication Year</label>
                 <input asp-for="PublicationYear" class="form-control" />
                 <span asp-validation-for="PublicationYear" class="text-danger"></span>
             </div>
@@ -39,21 +39,18 @@
                 <span asp-validation-for="Rating" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="GenreId" class="control-label"></label>
-                <select asp-for="GenreId" class="form-control" asp-items="ViewBag.Genres">
-                    <option value="">-- Select a Genre --</option> <!-- placeholder -->
+                <label asp-for="GenreId" class="control-label">Genre</label>
+                <select asp-for="GenreId" class="form-select" asp-items="ViewBag.Genres">
+                    <option value="">-- Select a Genre --</option>
                 </select>
                 <span asp-validation-for="GenreId" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group mt-2">
                 <input type="submit" value="Create" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Back</a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
