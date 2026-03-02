@@ -14,6 +14,7 @@ namespace BookReviewHub.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Genre>()
                 .HasData(
                     new Genre { Id = 1, Name = "Fiction" },
@@ -27,6 +28,12 @@ namespace BookReviewHub.Data
                     new Genre { Id = 9, Name = "Romance" },
                     new Genre { Id = 10, Name = "Thriller" }
                 );
+
+            modelBuilder.Entity<Book>()
+                .HasOne(b => b.Genre)
+                .WithMany(g => g.Books)
+                .HasForeignKey(b => b.GenreId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

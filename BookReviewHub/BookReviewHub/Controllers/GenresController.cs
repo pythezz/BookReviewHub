@@ -133,8 +133,6 @@ namespace BookReviewHub.Controllers
 
             return View(genre);
         }
-
-        // POST: Genres/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -143,13 +141,14 @@ namespace BookReviewHub.Controllers
                 .Include(g => g.Books)
                 .FirstOrDefaultAsync(g => g.Id == id);
 
-            if (genre != null)
+            if (genre == null)
             {
                 return NotFound();
             }
+
             if (genre.Books.Any())
             {
-                ModelState.AddModelError("", "Cannot delete genre because it has books assigned to it.");
+                ModelState.AddModelError("", "Cannot delete this genre because it has books assigned to it.");
                 return View(genre);
             }
 
