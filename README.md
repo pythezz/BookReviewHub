@@ -69,10 +69,10 @@ Upon running the project, there will be initial genre data seeded. There will be
 - Thriller
 
 Views:
-Home Page – landing page with links to Books and Genres
-Books Index – lists all books with Edit, Details, and Delete options
-Books Create/Edit – forms for managing books, including selecting a genre
-Books Details - shows details for selected book
-Genres Index – lists all genres with Edit, Details, and Delete options
-Genre Details - shows details for selected genre
-Genre Create/Edit – forms for managing genres
+- Home Page – landing page with links to Books and Genres
+- Books Index – lists all books with Edit, Details, and Delete options
+- Books Create/Edit – forms for managing books, including selecting a genre
+- Books Details - shows details for selected book
+- Genres Index – lists all genres with Edit, Details, and Delete options
+- Genre Details - shows details for selected genre
+- Genre Create/Edit – forms for managing genres
