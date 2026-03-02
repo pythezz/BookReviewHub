@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BookReviewHub.Data;
@@ -19,14 +15,14 @@ namespace BookReviewHub.Controllers
             _context = context;
         }
 
-        // GET: Books
+        // get books
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Books.Include(b => b.Genre);
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Books/Details/5
+        // get books details
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -45,7 +41,7 @@ namespace BookReviewHub.Controllers
             return View(book);
         }
 
-        // GET: Books/Create
+        // get books create
         public IActionResult Create()
         {
             var genres = _context.Genres.ToList();
@@ -53,9 +49,7 @@ namespace BookReviewHub.Controllers
             return View();
         }
 
-        // POST: Books/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // post create books
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Author,Description,PublicationYear,Rating,GenreId")] Book book)
@@ -72,7 +66,7 @@ namespace BookReviewHub.Controllers
             return View(book);
         }
 
-        // GET: Books/Edit/5
+        // get books edit
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -85,9 +79,7 @@ namespace BookReviewHub.Controllers
             return View(book);
         }
 
-        // POST: Books/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //post books edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Author,Description,PublicationYear,Rating,GenreId")] Book book)
@@ -121,7 +113,7 @@ namespace BookReviewHub.Controllers
             return View(book);
         }
 
-        // GET: Books/Delete/5
+        // get books edit
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -140,7 +132,7 @@ namespace BookReviewHub.Controllers
             return View(book);
         }
 
-        // POST: Books/Delete/5
+        //post books delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

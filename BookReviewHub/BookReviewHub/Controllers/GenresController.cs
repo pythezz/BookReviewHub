@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BookReviewHub.Data;
 using BookReviewHub.Models;
@@ -19,13 +14,13 @@ namespace BookReviewHub.Controllers
             _context = context;
         }
 
-        // GET: Genres
+        // get genres
         public async Task<IActionResult> Index()
         {
             return View(await _context.Genres.ToListAsync());
         }
 
-        // GET: Genres/Details/5
+        // get genres details
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -43,15 +38,13 @@ namespace BookReviewHub.Controllers
             return View(genre);
         }
 
-        // GET: Genres/Create
+        //get genres create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Genres/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // post genres create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name")] Genre genre)
@@ -65,7 +58,7 @@ namespace BookReviewHub.Controllers
             return View(genre);
         }
 
-        // GET: Genres/Edit/5
+        // get genres edit
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -81,9 +74,7 @@ namespace BookReviewHub.Controllers
             return View(genre);
         }
 
-        // POST: Genres/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // post genres edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Genre genre)
@@ -116,7 +107,7 @@ namespace BookReviewHub.Controllers
             return View(genre);
         }
 
-        // GET: Genres/Delete/5
+        // get genres delete
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -133,6 +124,8 @@ namespace BookReviewHub.Controllers
 
             return View(genre);
         }
+
+        //post genres delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -158,6 +151,7 @@ namespace BookReviewHub.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        //check if genre exists
         private bool GenreExists(int id)
         {
             return _context.Genres.Any(e => e.Id == id);
