@@ -1,4 +1,4 @@
-﻿@model BookReviewHub.Models.Genre
+@model BookReviewHub.ViewModels.GenreViewModel
 
 @{
     ViewData["Title"] = "Genre Details";
@@ -11,6 +11,11 @@
     <div class="row mb-3">
         <div class="col-sm-3 fw-bold">Genre Name</div>
         <div class="col-sm-9">@Model.Name</div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-sm-3 fw-bold">Number of Books</div>
+        <div class="col-sm-9">@Model.BookCount</div>
     </div>
 
     <div class="mt-4">

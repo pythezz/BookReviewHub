@@ -1,4 +1,4 @@
-﻿@model BookReviewHub.Models.Book
+@model BookReviewHub.ViewModels.BookViewModel
 
 @{
     ViewData["Title"] = "Delete Book";
@@ -22,18 +22,19 @@
         <dd class="col-sm-9">@Model.Author</dd>
 
         <dt class="col-sm-3">Genre</dt>
-        <dd class="col-sm-9">@Model.Genre?.Name</dd>
+        <dd class="col-sm-9">@Model.GenreName</dd>
 
         <dt class="col-sm-3">Publication Year</dt>
         <dd class="col-sm-9">@Model.PublicationYear</dd>
 
         <dt class="col-sm-3">Rating</dt>
-        <dd class="col-sm-9">@Model.Rating</dd>
+        <dd class="col-sm-9">@Model.Rating / 5</dd>
     </dl>
 
-    <form asp-action="Delete" class="mt-4">
-        <input type="hidden" asp-for="Id" />
-        <button type="submit" class="btn btn-danger">Delete</button>
+    <form asp-action="Delete" method="post" class="mt-4">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.Id" />
+        <button type="submit" class="btn btn-danger">Confirm Delete</button>
         <a asp-action="Index" class="btn btn-secondary">Cancel</a>
     </form>
 

@@ -1,155 +1,104 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using BookReviewHub.Data;
-using BookReviewHub.Models;
+using BookReviewHub.Services.Interfaces;
+using BookReviewHub.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BookReviewHub.Controllers
 {
     public class BooksController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IBookService _bookService;
+        private readonly IGenreService _genreService;
 
-        public BooksController(ApplicationDbContext context)
+        public BooksController(IBookService bookService, IGenreService genreService)
         {
-            _context = context;
+            _bookService = bookService;
+            _genreService = genreService;
         }
 
-        // get books
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Books.Include(b => b.Genre);
-            return View(await applicationDbContext.ToListAsync());
+            var books = await _bookService.GetAllAsync();
+            return View(books);
         }
 
-        // get books details
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var book = await _context.Books
-                .Include(b => b.Genre)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (book == null)
-            {
-                return NotFound();
-            }
+            var book = await _bookService.GetByIdAsync(id.Value);
+            if (book == null) return NotFound();
 
             return View(book);
         }
 
-        // get books create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            var genres = _context.Genres.ToList();
-            ViewBag.Genres = new SelectList(genres, "Id", "Name");
-            return View();
+            var model = new BookFormModel
+            {
+                Genres = await _genreService.GetSelectListAsync()
+            };
+            return View(model);
         }
 
-        // post create books
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Author,Description,PublicationYear,Rating,GenreId")] Book book)
-        {            
-            if (ModelState.IsValid)
+        public async Task<IActionResult> Create(BookFormModel model)
+        {
+            if (!ModelState.IsValid)
             {
-                _context.Add(book);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                model.Genres = await _genreService.GetSelectListAsync();
+                return View(model);
             }
 
-            var genres = _context.Genres.ToList();
-            ViewBag.Genres = new SelectList(genres, "Id", "Name", book.GenreId);
-            return View(book);
+            await _bookService.CreateAsync(model);
+            return RedirectToAction(nameof(Index));
         }
 
-        // get books edit
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
 
+            var model = await _bookService.GetFormModelByIdAsync(id.Value);
+            if (model == null) return NotFound();
 
-            var book = await _context.Books.FindAsync(id);
-            if (book == null) return NotFound();
-
-            ViewBag.Genres = new SelectList(_context.Genres, "Id", "Name", book.GenreId);
-            return View(book);
+            model.Genres = await _genreService.GetSelectListAsync();
+            return View(model);
         }
 
-        //post books edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Author,Description,PublicationYear,Rating,GenreId")] Book book)
+        public async Task<IActionResult> Edit(int id, BookFormModel model)
         {
-            if (id != book.Id)
+            if (id != model.Id) return NotFound();
+
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                model.Genres = await _genreService.GetSelectListAsync();
+                return View(model);
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(book);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BookExists(book.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["GenreId"] = new SelectList(_context.Genres, "Id", "Name", book.GenreId);
-            return View(book);
+            var updated = await _bookService.UpdateAsync(model);
+            if (!updated) return NotFound();
+
+            return RedirectToAction(nameof(Index));
         }
 
-        // get books edit
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var book = await _context.Books
-                .Include(b => b.Genre)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (book == null)
-            {
-                return NotFound();
-            }
+            var book = await _bookService.GetByIdAsync(id.Value);
+            if (book == null) return NotFound();
 
             return View(book);
         }
 
-        //post books delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var book = await _context.Books.FindAsync(id);
-            if (book != null)
-            {
-                _context.Books.Remove(book);
-            }
-
-            await _context.SaveChangesAsync();
+            await _bookService.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool BookExists(int id)
-        {
-            return _context.Books.Any(e => e.Id == id);
         }
     }
 }

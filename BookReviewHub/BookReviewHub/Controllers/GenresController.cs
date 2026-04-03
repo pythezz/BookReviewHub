@@ -1,160 +1,98 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BookReviewHub.Data;
-using BookReviewHub.Models;
+using BookReviewHub.Services.Interfaces;
+using BookReviewHub.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BookReviewHub.Controllers
 {
     public class GenresController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IGenreService _genreService;
 
-        public GenresController(ApplicationDbContext context)
+        public GenresController(IGenreService genreService)
         {
-            _context = context;
+            _genreService = genreService;
         }
 
-        // get genres
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Genres.ToListAsync());
+            var genres = await _genreService.GetAllAsync();
+            return View(genres);
         }
 
-        // get genres details
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var genre = await _context.Genres
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (genre == null)
-            {
-                return NotFound();
-            }
+            var genre = await _genreService.GetByIdAsync(id.Value);
+            if (genre == null) return NotFound();
 
             return View(genre);
         }
 
-        //get genres create
         public IActionResult Create()
         {
-            return View();
+            return View(new GenreFormModel());
         }
 
-        // post genres create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] Genre genre)
+        public async Task<IActionResult> Create(GenreFormModel model)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(genre);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(genre);
+            if (!ModelState.IsValid)
+                return View(model);
+
+            await _genreService.CreateAsync(model);
+            return RedirectToAction(nameof(Index));
         }
 
-        // get genres edit
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var genre = await _context.Genres.FindAsync(id);
-            if (genre == null)
-            {
-                return NotFound();
-            }
-            return View(genre);
+            var model = await _genreService.GetFormModelByIdAsync(id.Value);
+            if (model == null) return NotFound();
+
+            return View(model);
         }
 
-        // post genres edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Genre genre)
+        public async Task<IActionResult> Edit(int id, GenreFormModel model)
         {
-            if (id != genre.Id)
-            {
-                return NotFound();
-            }
+            if (id != model.Id) return NotFound();
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(genre);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!GenreExists(genre.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(genre);
-        }
+            if (!ModelState.IsValid)
+                return View(model);
 
-        // get genres delete
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var genre = await _context.Genres
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (genre == null)
-            {
-                return NotFound();
-            }
-
-            return View(genre);
-        }
-
-        //post genres delete
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var genre = await _context.Genres
-                .Include(g => g.Books)
-                .FirstOrDefaultAsync(g => g.Id == id);
-
-            if (genre == null)
-            {
-                return NotFound();
-            }
-
-            if (genre.Books.Any())
-            {
-                ModelState.AddModelError("", "Cannot delete this genre because it has books assigned to it.");
-                return View(genre);
-            }
-
-            _context.Genres.Remove(genre);
-            await _context.SaveChangesAsync();
+            var updated = await _genreService.UpdateAsync(model);
+            if (!updated) return NotFound();
 
             return RedirectToAction(nameof(Index));
         }
 
-        //check if genre exists
-        private bool GenreExists(int id)
+        public async Task<IActionResult> Delete(int? id)
         {
-            return _context.Genres.Any(e => e.Id == id);
+            if (id == null) return NotFound();
+
+            var genre = await _genreService.GetByIdAsync(id.Value);
+            if (genre == null) return NotFound();
+
+            return View(genre);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            if (await _genreService.HasBooksAsync(id))
+            {
+                var genre = await _genreService.GetByIdAsync(id);
+                ModelState.AddModelError("", "Cannot delete this genre because it has books assigned to it.");
+                return View(genre);
+            }
+
+            await _genreService.DeleteAsync(id);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

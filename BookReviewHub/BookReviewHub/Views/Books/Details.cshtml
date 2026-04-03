@@ -1,4 +1,4 @@
-﻿@model BookReviewHub.Models.Book
+@model BookReviewHub.ViewModels.BookViewModel
 
 @{
     ViewData["Title"] = "Book Details";
@@ -17,7 +17,7 @@
 
     <div class="row mb-2">
         <div class="col-sm-3 fw-bold">Genre</div>
-        <div class="col-sm-9">@Model.Genre?.Name</div>
+        <div class="col-sm-9">@Model.GenreName</div>
     </div>
 
     <div class="row mb-2">
@@ -27,7 +27,7 @@
 
     <div class="row mb-2">
         <div class="col-sm-3 fw-bold">Rating</div>
-        <div class="col-sm-9">@Model.Rating</div>
+        <div class="col-sm-9">@Model.Rating / 5</div>
     </div>
 
     <hr class="my-4" />
